@@ -1,0 +1,124 @@
+.cart {
+    padding-top: 80px;
+}
+.cart_name {
+    margin-bottom: 31px;
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 40px;
+    text-transform: uppercase;
+    color: #1D1F22;
+}
+
+.cart_item {
+    width: 100%;
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #E5E5E5;
+}
+
+.cart_item_info {
+    margin-top: 24px;
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 27px;
+}
+
+.cart_item_info_brand {
+    margin-top: 16px;
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 27px;
+}
+
+.cart_item_info_amount {
+    margin-top: 20px;
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 24px;
+}
+
+.cart_item_img {
+    width: 270px;
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.cart_item_img_quantity {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.cart_item_img_quantity_symbol {
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+}
+
+.cart_item_img_quantity_number {
+    margin: auto;
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 160%;
+}
+
+.cart_item_img_pictue {
+    width: 200px;
+    height: 288px;
+}
+
+.cart_order {
+    padding-top: 49px;
+}
+
+.cart_order_item {
+    padding-top: 8px;
+}
+
+.cart_order_name {
+    display: inline;
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 28px;
+}
+
+.cart_order_value {
+    display: inline;
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 28px;
+}
+
+.cart_order_button {
+    width: 279px;
+    height: 43px;
+    margin-top: 20px;
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 120%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    background: #5ECE7B;
+}

@@ -1,0 +1,160 @@
+.pdp_item {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 82px;
+}
+
+.pdp_item_gallery {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100px;
+    height: 511px;
+}
+
+.pdp_item_gallery_arrow_wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 30px;
+
+}
+
+.pdp_item_gallery_up, 
+.pdp_item_gallery_down {
+    width: 30px;
+    height: 30px;
+    margin: auto;
+    cursor: pointer;
+}
+
+.arrow-bottom-3 {
+    color: #000;
+}
+
+.plp_item_small_img {
+    width: 79px;
+    height: 80px;
+    padding: 20px 7px 20px 7px;
+    cursor: pointer;
+}
+
+.pdp_item_big_img {
+    width: 610px;
+    height: 511px;
+    padding: 0px 100px 0 25px;
+}
+
+.pdp_item_info {
+    width: 292px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.pdp_item_info_name {
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 27px;
+}
+
+.pdp_item_info_brand {
+    padding-top: 16px;
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 27px;
+}
+
+.pdp_item_info_atributes {
+    margin-top: 19px;
+}
+
+.pdp_item_info_atributes_name {
+    margin-top: 23px;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 18px;
+    text-transform: uppercase;
+}
+
+.pdp_item_info_atributes_items {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.pdp_item_info_atributes_items_item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 63px;
+    height: 45px;
+    margin-right: 12px;
+    padding: 2px;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    border: 1px solid #1D1F22;
+    cursor: pointer;
+
+}
+
+.pdp_item_info_price {
+    margin-top: 36px;
+}
+
+.pdp_item_info_price_name {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 18px;
+}
+
+.pdp_item_info_price_amount {
+    margin-top: 20px;
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 18px;
+}
+
+.pdp_item_info_button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 292px;
+    height: 52px;
+    margin-top: 25px;
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 120%;
+    color: #FFFFFF;
+    background-color: #5ECE7B;
+    cursor: pointer;
+}
+
+.pdp_item_info_description {
+    margin-top: 40px;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 159.96%;
+}
+
+.pdp_item_info_atributes:first {
+    color: #5ECE7B;
+}

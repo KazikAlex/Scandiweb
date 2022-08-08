@@ -1,0 +1,18 @@
+.main_cart_item_img_pictue_wrapper {
+    position: relative;
+}
+
+.main_cart_item_img_pictue_left,
+.main_cart_item_img_pictue_right
+ {
+    position: absolute;
+    bottom: 16px;
+}
+
+.main_cart_item_img_pictue_right {
+    right: 16px;
+}
+
+.main_cart_item_img_pictue_left {
+    right: 48px;
+}
