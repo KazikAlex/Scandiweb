@@ -1,25 +1,36 @@
+import React from 'react'
 import { useParams } from 'react-router-dom'
-import Main from '../UI/Main/Main'
-import Plp from '../UI/Plp/Plp'
-import Pdp from '../UI/Pdp/Pdp'
+import spinner from './picture/spinner.gif'
 
-export const UseWithRouterMain = (props) => {
-    const params = useParams()
-    return (
-        <Main params={params} {...props} />
-      )
+export const UseWithRouter = (props) => {
+  const params = useParams()
+  const childrenWithProps = props.children.map((child, key) =>  React.cloneElement(child, {props: props, params: params, key: key}) )
+
+  return (
+    <div>
+      {childrenWithProps}
+    </div>
+  )
 }
 
-export const UseWithRouterPlp = (props) => {
-    const params = useParams()
-    return (
-        <Plp params={params} {...props} />
-      )
-}
+export const SpinnerComponent = (props) => {
+  const params = useParams()
 
-export const UseWithRouterPdp = (props) => {
-    const params = useParams()
-    return (
-        <Pdp params={params} {...props} />
-      )
+  if (props.categories.length < 1) {
+    props.getHeaderInfo()
+  }
+
+  if (props.categories.length > 0 && props.categoryProducts.length < 1) {
+    props.getCategoryProducts(params.category)
+  }
+  
+  if (props.categoryProducts.length > 0 && props.product.id === undefined) { 
+    props.getProduct(params.id)
+  }
+
+  return (
+    <div className="container">
+      <img className="spinner" src={spinner} alt="spiner" />
+    </div>
+  )
 }

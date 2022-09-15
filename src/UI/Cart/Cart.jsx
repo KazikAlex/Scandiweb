@@ -10,7 +10,9 @@ export default class Cart extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.activeCurrency !== prevProps.activeCurrency || this.props.cartQuantity !== prevProps.cartQuantity || this.props.itemCartQuantity !== prevProps.itemCartQuantity ) {
+    if (this.props.activeCurrency !== prevProps.activeCurrency || 
+      this.props.cartTotalQuantity !== prevProps.cartTotalQuantity || 
+      this.props.itemCartQuantity !== prevProps.itemCartQuantity ) {
       this.props.totalItemCartCounter()
     }
   }

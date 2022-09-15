@@ -1,3 +1,13 @@
+.active_attribute {
+    background-color:black;
+    color: #FFFFFF;
+}
+
+.active_attribute_color {
+    border: 3px solid #fff !important;
+    outline: 1px solid #5ECE7B !important;
+}
+
 .pdp_item {
     display: flex;
     justify-content: space-between;
@@ -36,6 +46,7 @@
     width: 79px;
     height: 80px;
     padding: 20px 7px 20px 7px;
+    object-fit: contain;
     cursor: pointer;
 }
 
@@ -43,6 +54,12 @@
     width: 610px;
     height: 511px;
     padding: 0px 100px 0 25px;
+}
+
+.pdp_item_big_img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .pdp_item_info {
@@ -105,7 +122,14 @@
     line-height: 18px;
     border: 1px solid #1D1F22;
     cursor: pointer;
+}
 
+.pdp_item_info_atributes_items_item_swatch {
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+    border: 1px solid #1D1F22;
+    cursor: pointer;
 }
 
 .pdp_item_info_price {
@@ -121,6 +145,7 @@
 }
 
 .pdp_item_info_price_amount {
+    display: inline;
     margin-top: 20px;
     font-family: 'Raleway';
     font-style: normal;

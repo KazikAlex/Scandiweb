@@ -1,22 +1,26 @@
 import './App.css'
 import { Component } from 'react'
+import Plp from './UI/Plp/Plp'
 import Cart from './UI/Cart/Cart'
 import Page404 from './UI/Page404/Page404'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { Query, client } from '@tilework/opus'
-import { UseWithRouterMain, UseWithRouterPlp, UseWithRouterPdp } from './utils/withRouterWrappers'
+import { SpinnerComponent, UseWithRouter} from './utils/withRouterWrappers'
+import Main from './UI/Main/Main'
+import Pdp from './UI/Pdp/Pdp'
 
 class App extends Component {
+
   constructor(props) {
     super(props)
     this.state = {
       categories: [],
-      currencies: [],
+      activeCategory: '',
+      currencies: [], 
       activeCurrency: '',
       categoryProducts: [],
       product: {},
       cart: [],
-      cartQuantity: 0,
       itemCartQuantity: 1,
       hideSelect: true,
       hideCartOverlay: true,
@@ -29,7 +33,7 @@ class App extends Component {
       cartTotalTax: 0,
       cartTotal: 0
     }
-
+  
     this.getHeaderInfo = this.getHeaderInfo.bind(this)
     this.getCategoryProducts = this.getCategoryProducts.bind(this)
     this.getProduct = this.getProduct.bind(this)
@@ -46,12 +50,17 @@ class App extends Component {
     this.totalItemCartCounter = this.totalItemCartCounter.bind(this)
     this.setQuantityInCart = this.setQuantityInCart.bind(this)
     this.setActiveImgInOverlay =this.setActiveImgInOverlay.bind(this)
+    this.htmlToReact = this.htmlToReact.bind(this)
   }
 
-  componentDidMount() {
-    this.getHeaderInfo()
-  }
+  componentDidUpdate(prevProps) {
+    if ( this.state.categories.length < 1) {
+      this.getHeaderInfo()
+    }
 
+    if (this.state.cart.length > 0 && this.state.cartTotal === 0)
+    this.totalItemCartCounter()
+  }
 
   getHeaderInfo = async () => {
     client.setEndpoint('http://localhost:4000/')
@@ -61,21 +70,42 @@ class App extends Component {
       currencies { 
         label 
         symbol 
-      }`
+      }
+      `
     )
     const response = await client.post(query )
-    this.setState({...this.state, categories: response.categories, currencies: response.currencies, activeCurrency: response.currencies[0].symbol })
+
+    this.setState(
+      {
+        ...this.state, 
+        categories: response.categories, 
+        currencies: response.currencies,
+        activeCurrency: response.currencies[0].symbol, 
+        activeCategory: response.categories[0].name,
+      })
   }
 
   getCategoryProducts = async (category) => {
     client.setEndpoint('http://localhost:4000/')
-    const query = new Query(`
-      category(input: {title: "${category}"}) {
+    const query = new Query(
+      `category(input: {title: "${category}"}) {
         products {
           id
           name
-          gallery 
+          inStock
+          gallery
+          description
           category
+          attributes {
+            id
+            name
+            type
+            items {
+              id
+              displayValue
+              value
+            }
+          }
           prices {
             currency {
               label
@@ -83,67 +113,50 @@ class App extends Component {
             }
             amount
           }
+          brand
         }
-      } 
-    `)
-  
-    try {
-      const response = await client.post(query)
-      this.setState({...this.state, categoryProducts: response.category.products})
-    }catch {
-      console.log('error')
-      window.location.href = "/page404"
-    }
-  }
-  
-
-  getProduct = async (id) => {
-    client.setEndpoint('http://localhost:4000/')
-    const query = new Query(`
-      product(id: "${id}") {
-        id
-        name
-        inStock
-        gallery
-        description
-        attributes {
-          id
-          name
-          type
-          items {
-            id
-            displayValue
-            value
-          }
-        }
-        prices {
-          currency {
-            label
-            symbol
-          }
-          amount
-        }
-        brand
       }
-      `)
-
+      `
+    )
+    const response = await client.post(query )
+      
     try {
-      const response = await client.post(query )
+      const products = JSON.parse(JSON.stringify(response.category.products))
 
-      const newProduct = JSON.parse(JSON.stringify(response.product))
-  
-      newProduct.attributes.map((atr, index) => 
-        atr.items.map((item, index) => 
-          index === 0 ? item.active = true : item.active = false
+      products.map((poduct) => 
+        poduct.attributes.map((atr) => 
+          atr.items.map((item, index) =>
+            index === 0 ? item.active = true : item.active = false
+          )
         )
       )
-      
+  
+      this.setState({
+        ...this.state, 
+        categoryProducts: products,
+        activeCategory: category
+      })
+    } catch {
+      <Navigate to="/page404"  />
+    }
+    
+  }
+
+  getProduct = (productId) => {
+    let newProduct = this.state.categoryProducts.find((product) => productId === product.id )
+    if (newProduct === undefined) {
+      <Navigate to="/page404"  />
+    }else {
       this.setState({...this.state, product: newProduct})
-    }catch {
-      console.log('error')
     }
 
-    
+  }
+
+  htmlToReact(htmlInput) {
+    const HtmlToReactParser = require('html-to-react').Parser;
+    const htmlToReactParser = new HtmlToReactParser();
+    const reactElement = htmlToReactParser.parse(htmlInput);
+    return reactElement
   }
 
   toggleHideSelect() {
@@ -209,32 +222,38 @@ class App extends Component {
   }
 
   addToCart(newItem) {
-    if (this.state.cart.length === 0 ) {
-      newItem.quantity = 1
-      newItem.ativeImg = 0
-      this.state.cart.push(JSON.parse(JSON.stringify(newItem)))
-      this.setState({...this.state, cartQuantity: this.state.cartQuantity + 1})
-    }else {
-      let plusQuantity = this.state.cart.find((item) => item.id === newItem.id && JSON.stringify(item.attributes) === JSON.stringify(newItem.attributes) )
-
-      if (plusQuantity !== undefined) {
-        plusQuantity.quantity += 1
-        this.setState({...this.state, itemCartQuantity : this.state.itemCartQuantity + 1})
-      }else {
+    if (newItem.inStock) {
+      if (this.state.cart.length === 0 ) {
         newItem.quantity = 1
         newItem.ativeImg = 0
         this.state.cart.push(JSON.parse(JSON.stringify(newItem)))
-        this.setState({...this.state, cartQuantity: this.state.cartQuantity + 1})
-      }
-    } 
+        this.setState({...this.state, cartTotalQuantity: this.state.cartTotalQuantity + 1, 
+        })
+      }else {
+        let plusQuantity = this.state.cart.find((item) => item.id === newItem.id && JSON.stringify(item.attributes) === JSON.stringify(newItem.attributes) )
+  
+        if (plusQuantity !== undefined) {
+          plusQuantity.quantity += 1
+          this.setState({...this.state, itemCartQuantity : this.state.itemCartQuantity + 1, cartTotalQuantity: this.state.cartTotalQuantity + 1})
+        }else {
+          newItem.quantity = 1
+          newItem.ativeImg = 0
+          this.state.cart.push(JSON.parse(JSON.stringify(newItem)))
+          this.setState({
+            ...this.state, 
+            cartTotalQuantity: this.state.cartTotalQuantity + 1
+          })
+        }
+      } 
+    }
   }
 
   slider() {
     const smallImgArray = []
 
     for(let i = this.state.slideIndex; i < this.state.slideIndex + 3; i++) {
-      smallImgArray.push(<img className="plp_item_small_img" 
-        key={this.state.product.gallery[i].id} 
+      smallImgArray.push(<img className="plp_item_small_img"  
+        key={i}
         src={this.state.product.gallery[i]} 
         alt="product_img" 
         onClick={() => this.setActiveImg(i)} />)
@@ -274,61 +293,175 @@ class App extends Component {
 
     if(direction === 'plus') {
       foundItem.quantity = foundItem.quantity + 1
-      this.setState({...this.state, itemCartQuantity: foundItem.quantity})
+      this.setState({
+        ...this.state, 
+        itemCartQuantity: foundItem.quantity, 
+        cartTotalQuantity: this.state.cartTotalQuantity + 1, 
+      })
     }else {
       if(foundItem.quantity === 1) {
         this.state.cart.splice(key, 1)
-        this.setState({...this.state, itemCartQuantity: foundItem.quantity, cartQuantity: this.state.cartQuantity - 1})
+        this.setState({
+          ...this.state, 
+          itemCartQuantity: foundItem.quantity, 
+          cartTotalQuantity: this.state.cartTotalQuantity - 1, 
+          cartTotal: 0, 
+          cartTotalTax: 0, 
+        })
       }else {
         foundItem.quantity = foundItem.quantity - 1 
-        this.setState({...this.state, itemCartQuantity: foundItem.quantity})
+        this.setState({
+          ...this.state, 
+          itemCartQuantity: foundItem.quantity, 
+          cartTotalQuantity: this.state.cartTotalQuantity - 1, 
+        })
       }
     }
   }
 
   render() {
     return (
-      <div className="App" 
-          onClick={() => {if(!this.state.hideSelect) {this.toggleHideSelect()}}} >
+      <div className="app" onClick={() => {if(!this.state.hideSelect) {this.toggleHideSelect()}}} >
         <Routes>
-          <Route path="/" element={<UseWithRouterMain
-              {...this.state}  
-              getHeaderInfo = {this.getHeaderInfo} 
-              currencySelect = {this.currencySelect}
-              toggleHideSelect = {this.toggleHideSelect}
-              toggleCartOverlay = {this.toggleCartOverlay} 
-              setActiveAttribute = {this.setActiveAttribute} 
-              setActiveAttributeInCart = {this.setActiveAttributeInCart} 
-              setQuantityInCart = {this.setQuantityInCart}
-              setActiveImgInOverlay = {this.setActiveImgInOverlay}
-              /> }>
-            <Route path="/:category" element={<UseWithRouterPlp 
+
+          <Route path="/" element={ 
+            !this.state.activeCategory
+            ?
+            <SpinnerComponent 
               {...this.state} 
+              getHeaderInfo={this.getHeaderInfo} 
               getCategoryProducts = {this.getCategoryProducts} 
-              toggleCartOverlay = {this.toggleCartOverlay} 
-              /> }
-            />        
-            <Route path="/:category/:id" element={<UseWithRouterPdp  
-              {...this.state} 
-              getProduct = {this.getProduct} 
-              addToCart = {this.addToCart} 
-              setActiveImg = {this.setActiveImg}
-              setActiveAttribute = {this.setActiveAttribute} 
-              slider = {this.slider} 
-              sliderClick = {this.sliderClick}
-              setToZerroSlideIndex = {this.setToZerroSlideIndex}
-              toggleCartOverlay = {this.toggleCartOverlay} 
-              />} 
-            />       
-            <Route path="/cart" element={<Cart 
-              {...this.state} 
-              setActiveAttributeInCart = {this.setActiveAttributeInCart} 
-              toggleCartOverlay = {this.toggleCartOverlay}
-              totalItemCartCounter = {this.totalItemCartCounter}
-              setQuantityInCart = {this.setQuantityInCart}
-              />} />
-            <Route path="*" element={<Page404 />} />
-          </ Route >
+              getProduct = {this.getProduct}
+            />
+            :
+            <Navigate to={this.state.activeCategory && `/${this.state.activeCategory}`}  /> } 
+          />
+
+          <Route path="/:category" 
+            element={ 
+              this.state.categoryProducts < 1 
+              ?
+              <SpinnerComponent 
+                {...this.state} 
+                getHeaderInfo={this.getHeaderInfo} 
+                getCategoryProducts = {this.getCategoryProducts} 
+                getProduct = {this.getProduct}  
+              />
+              :
+              <UseWithRouter {...this.state} >
+                <Main 
+                  {...this.state}
+                  {...this.props}
+                  toggleHideSelect = {this.toggleHideSelect}  
+                  currencySelect = {this.currencySelect}  
+                  toggleCartOverlay = {this.toggleCartOverlay}  
+                  totalItemCartCounter = {this.totalItemCartCounter} 
+                  setQuantityInCart = {this.setQuantityInCart}
+                  setActiveImgInOverlay = {this.setActiveImgInOverlay}
+                  setActiveAttributeInCart = { this.setActiveAttributeInCart}
+
+                />
+                <Plp
+                  {...this.state} 
+                  {...this.props}  
+                  getHeaderInfo = {this.getHeaderInfo} 
+                  getCategoryProducts = {this.getCategoryProducts} 
+                  getProduct = {this.getProduct} 
+                  toggleCartOverlay = {this.toggleCartOverlay} 
+                  addToCart = {this.addToCart} 
+
+                  totalItemCartCounter = {this.totalItemCartCounter} 
+                  currencySelect = {this.currencySelect}
+                  toggleHideSelect = {this.toggleHideSelect}
+                  setActiveAttribute = {this.setActiveAttribute} 
+                  setActiveAttributeInCart = {this.setActiveAttributeInCart} 
+                  setQuantityInCart = {this.setQuantityInCart}
+                  setActiveImgInOverlay = {this.setActiveImgInOverlay}
+                />
+              </UseWithRouter>
+              
+            }
+          />        
+          <Route path="/:category/:id" 
+            element={ 
+              this.state.product.id === undefined 
+              ?
+              <SpinnerComponent 
+                {...this.state}
+                getHeaderInfo={this.getHeaderInfo} 
+                getCategoryProducts = {this.getCategoryProducts} 
+                getProduct = {this.getProduct}
+              />
+              :
+              <UseWithRouter >
+                  <Main 
+                    {...this.state}
+                    {...this.props}
+                    toggleHideSelect = {this.toggleHideSelect}  
+                    currencySelect = {this.currencySelect}  
+                    toggleCartOverlay = {this.toggleCartOverlay}  
+                    totalItemCartCounter = {this.totalItemCartCounter} 
+                    setQuantityInCart = {this.setQuantityInCart}
+                    setActiveImgInOverlay = {this.setActiveImgInOverlay}
+                    setActiveAttributeInCart = { this.setActiveAttributeInCart}
+                  />
+                  <Pdp  
+                    {...this.state} 
+                    {...this.props}  
+                    getProduct = {this.getProduct} 
+                    addToCart = {this.addToCart} 
+                    setActiveImg = {this.setActiveImg}
+                    setActiveAttribute = {this.setActiveAttribute} 
+                    slider = {this.slider} 
+                    sliderClick = {this.sliderClick}
+                    setToZerroSlideIndex = {this.setToZerroSlideIndex}
+                    toggleCartOverlay = {this.toggleCartOverlay} 
+                    htmlToReact = {this.htmlToReact}
+                    totalItemCartCounter = {this.totalItemCartCounter} 
+                    getHeaderInfo = {this.getHeaderInfo} 
+                    getCategoryProducts = {this.getCategoryProducts} 
+                    currencySelect = {this.currencySelect}
+                    toggleHideSelect = {this.toggleHideSelect}
+                    setActiveAttributeInCart = {this.setActiveAttributeInCart} 
+                    setQuantityInCart = {this.setQuantityInCart}
+                    setActiveImgInOverlay = {this.setActiveImgInOverlay}
+                />
+              </UseWithRouter>
+              
+            } 
+          />       
+
+          <Route path="/cart" 
+            element={
+              <UseWithRouter>
+                <Main 
+                  {...this.state}
+                  {...this.props}
+                  toggleHideSelect = {this.toggleHideSelect}  
+                  currencySelect = {this.currencySelect}  
+                  toggleCartOverlay = {this.toggleCartOverlay}  
+                  totalItemCartCounter = {this.totalItemCartCounter} 
+                  setQuantityInCart = {this.setQuantityInCart}
+                  setActiveImgInOverlay = {this.setActiveImgInOverlay}
+                  setActiveAttributeInCart = { this.setActiveAttributeInCart}
+                />
+              <Cart 
+                {...this.state} 
+                {...this.props}  
+                // currencySelect = {this.currencySelect}
+                // toggleHideSelect = {this.toggleHideSelect}
+                // setActiveImgInOverlay = {this.setActiveImgInOverlay}
+                setActiveAttributeInCart = {this.setActiveAttributeInCart} 
+                toggleCartOverlay = {this.toggleCartOverlay}
+                totalItemCartCounter = {this.totalItemCartCounter}
+                setQuantityInCart = {this.setQuantityInCart}
+              />
+              </UseWithRouter>
+            } 
+          />
+
+          <Route path="/page404" element={<Page404 />} />
+
         </Routes>
       </div>
     )

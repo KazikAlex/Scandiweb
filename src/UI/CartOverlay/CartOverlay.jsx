@@ -7,14 +7,26 @@ import rightArrow from '../../utils/picture/rightArrow.svg'
 import './cartOverlay.css'
 
 export default class CartOverlay extends Component {
+
+  componentDidMount() {
+    this.props.totalItemCartCounter()
+  }
+  
+  componentDidUpdate(prevProps) {
+    if (this.props.activeCurrency !== prevProps.activeCurrency || 
+      this.props.cartTotalQuantity !== prevProps.cartTotalQuantity || 
+      this.props.itemCartQuantity !== prevProps.itemCartQuantity ) {
+      this.props.totalItemCartCounter()
+    }
+  } 
+  
   render() {
     return (
         <div className={this.props.hideCartOverlay ? "cart_overlay hide" : "cart_overlay"  }>
         <div className="cart_overlay_header">
-          My Bag, {this.props.cartQuantity} items
+          My Bag, {this.props.cartTotalQuantity} items
         </div>
         <div className="cart_overlay_items">
-          
           {this.props.cart.map((item, itemKey) => 
             <div className="main_cart_item" key={item.id + itemKey}>
               <div className="main_cart_item_info">
@@ -37,11 +49,20 @@ export default class CartOverlay extends Component {
                       <div className="main_item_info_atributes_name">{atr.name}:</div>
                       <div className="pdp_item_info_atributes_items">
                         {atr.items.map((itemsItem, itemsItemKey) => 
-                          <div className={(itemsItem.active !== true) ? "main_item_info_atributes_items_item" : (atr.name === 'Color') ? "main_item_info_atributes_items_item active_attribute color" : "main_item_info_atributes_items_item active_attribute" }
-                              key={itemsItem.id + itemsItemKey}
-                              style={atr.name === 'Color' ? {backgroundColor: itemsItem.value, width: 32 + 'px', height: 32 + 'px'} : {}} 
-                              onClick={() => this.props.setActiveAttributeInCart(item.id, atr.id, itemsItem.id, item.attributes)} >
-                            {atr.type === 'text' ? itemsItem.value : ""}
+                          atr.type === 'swatch'
+                          ?
+                          <div className={itemsItem.active ? "pdp_item_info_atributes_items_item_swatch active_attribute_color" : "pdp_item_info_atributes_items_item_swatch"}
+                            key={itemsItem.id + itemsItemKey}
+                            style={{backgroundColor: itemsItem.value}}
+                            onClick={() => this.props.setActiveAttributeInCart(item.id, atr.id, itemsItem.id, item.attributes)}
+                          >
+                          </div>
+                          :
+                          <div className={itemsItem.active ? "pdp_item_info_atributes_items_item active_attribute" : "pdp_item_info_atributes_items_item"}
+                            key={itemsItem.id + itemsItemKey}
+                            onClick={() => this.props.setActiveAttributeInCart(item.id, atr.id, itemsItem.id, item.attributes)}
+                          >
+                            {itemsItem.value}
                           </div>
                         )}
                       </div>
@@ -65,12 +86,12 @@ export default class CartOverlay extends Component {
                 </div>
                 <div className="main_cart_item_img_pictue_wrapper">
                   <img className="main_cart_item_img_pictue" src={item.gallery[item.ativeImg]} alt="product" />
-                  <img className="main_cart_item_img_pictue_right" 
+                  <img className={item.gallery.length > 1 ? "main_cart_item_img_pictue_right" : "main_cart_item_img_pictue_right hide"} 
                     src={rightArrow} 
                     alt="right" 
                     onClick={() => this.props.setActiveImgInOverlay(item.gallery.length, itemKey, "right")}
                   />
-                  <img className="main_cart_item_img_pictue_left"
+                  <img className={item.gallery.length > 1 ? "main_cart_item_img_pictue_left" : "main_cart_item_img_pictue_left hide"} 
                     src={leftArrow} 
                     alt="left"
                     onClick={() => this.props.setActiveImgInOverlay(item.gallery.length, itemKey, "left")}
@@ -79,7 +100,6 @@ export default class CartOverlay extends Component {
               </div>
             </div>
           )}
-          
         </div>
         <div className="cart_overlay_buttons">
           <Link className="cart_overlay_buttons_view" to="/cart" onClick={() => this.props.toggleCartOverlay()}  >view bag</Link>

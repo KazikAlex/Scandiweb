@@ -1,6 +1,14 @@
+/* .app {
+    background-color: rgb(249, 249, 249);
+} */
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
+}
+
+.hide {
+    display: none;
 }
 
 .spinner {
@@ -8,18 +16,4 @@
     width: 100px;
     height: 100px;
     margin: auto auto;
-}
-
-.active_attribute {
-    background-color:black;
-    color: #FFFFFF;
-}
-
-.hide {
-    display: none;
-}
-
-.color {
-    border: 3px solid #fff !important;
-    outline: 1px solid #5ECE7B !important;
 }
