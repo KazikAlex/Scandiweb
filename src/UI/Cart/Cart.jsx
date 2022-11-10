@@ -39,17 +39,25 @@ export default class Cart extends Component {
                   )}
                 </div>
                 <div className="pdp_item_info_atributes">
-                  {item.attributes.map((atr) => 
-                    <div key={atr.id}>
-                      <div className="pdp_item_info_atributes_name">{atr.name}:</div>
+                  {item.attributes.map((atr, atrKey) => 
+                    <div key={atr.id + atrKey}>
+                      <div className="main_item_info_atributes_name">{atr.name}:</div>
                       <div className="pdp_item_info_atributes_items">
-                        {atr.items.map((itemsItem) => 
-                          <div className={(itemsItem.active !== true) ? "pdp_item_info_atributes_items_item" : (atr.name === 'Color') ? "pdp_item_info_atributes_items_item active_attribute color" : "pdp_item_info_atributes_items_item active_attribute" }
-                              key={itemsItem.id} 
-                              style={atr.name === 'Color' ? {backgroundColor: itemsItem.value, width: 32 + 'px', height: 32 + 'px'} : {}} 
-                              onClick={() => this.props.setActiveAttributeInCart(item.id, atr.id, itemsItem.id, item.attributes)} 
-                              >
-                            {atr.type === 'text' ? itemsItem.value : ""}
+                        {atr.items.map((itemsItem, itemsItemKey) => 
+                          atr.type === 'swatch'
+                          ?
+                          <div className={itemsItem.active ? "pdp_item_info_atributes_items_item_swatch active_attribute_color" : "pdp_item_info_atributes_items_item_swatch"}
+                            key={itemsItem.id + itemsItemKey}
+                            style={{backgroundColor: itemsItem.value}}
+                            onClick={() => this.props.setActiveAttributeInCart(item.id, atr.id, itemsItem.id, item.attributes)}
+                          >
+                          </div>
+                          :
+                          <div className={itemsItem.active ? "pdp_item_info_atributes_items_item active_attribute" : "pdp_item_info_atributes_items_item"}
+                            key={itemsItem.id + itemsItemKey}
+                            onClick={() => this.props.setActiveAttributeInCart(item.id, atr.id, itemsItem.id, item.attributes)}
+                          >
+                            {itemsItem.value}
                           </div>
                         )}
                       </div>

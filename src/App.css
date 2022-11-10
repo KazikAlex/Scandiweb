@@ -1,6 +1,16 @@
-/* .app {
-    background-color: rgb(249, 249, 249);
-} */
+.app_overlay::after {
+    min-height: 100%;
+    width: 100%;
+    overflow: hidden;
+    content: '';
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    background: rgba(57, 55, 72, 0.22);
+}
 
 .container {
     max-width: 1200px;

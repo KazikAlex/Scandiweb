@@ -23,7 +23,7 @@ export const SpinnerComponent = (props) => {
   if (props.categories.length > 0 && props.categoryProducts.length < 1) {
     props.getCategoryProducts(params.category)
   }
-  
+
   if (props.categoryProducts.length > 0 && props.product.id === undefined) { 
     props.getProduct(params.id)
   }

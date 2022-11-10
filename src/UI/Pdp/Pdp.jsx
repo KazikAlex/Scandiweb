@@ -6,7 +6,6 @@ import './pdp.css'
 export default class Pdp extends Component {
 
   componentDidMount() {
-    this.props.getProduct(this.props.params.id)
     this.props.setToZerroSlideIndex()
   }
 

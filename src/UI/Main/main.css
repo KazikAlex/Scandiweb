@@ -1,7 +1,3 @@
-/* .main {
-    background-color: rgb(249, 249, 249);
-} */
-
 .header {
     height: 80px;
     display: flex;
@@ -97,10 +93,6 @@
     align-items: center;
     cursor: pointer;
 }
-
-/* .main_cart_link:hover ~ .cart_overlay {
-    display: block;
-} */
 
 .main_cart_img {
     width: 20px;

@@ -160,7 +160,7 @@
     align-items: center;
     width: 292px;
     height: 52px;
-    margin-top: 25px;
+    margin: 25px auto 0;
     font-family: 'Raleway';
     font-style: normal;
     font-weight: 600;

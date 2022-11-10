@@ -1,5 +1,5 @@
 import './App.css'
-import { Component } from 'react'
+import React, { Component } from 'react'
 import Plp from './UI/Plp/Plp'
 import Cart from './UI/Cart/Cart'
 import Page404 from './UI/Page404/Page404'
@@ -8,6 +8,7 @@ import { Query, client } from '@tilework/opus'
 import { SpinnerComponent, UseWithRouter} from './utils/withRouterWrappers'
 import Main from './UI/Main/Main'
 import Pdp from './UI/Pdp/Pdp'
+import { nanoid } from 'nanoid'
 
 class App extends Component {
 
@@ -118,7 +119,7 @@ class App extends Component {
       }
       `
     )
-    const response = await client.post(query )
+    const response = await client.post(query)
       
     try {
       const products = JSON.parse(JSON.stringify(response.category.products))
@@ -130,7 +131,7 @@ class App extends Component {
           )
         )
       )
-  
+
       this.setState({
         ...this.state, 
         categoryProducts: products,
@@ -142,14 +143,14 @@ class App extends Component {
     
   }
 
-  getProduct = (productId) => {
-    let newProduct = this.state.categoryProducts.find((product) => productId === product.id )
-    if (newProduct === undefined) {
-      <Navigate to="/page404"  />
-    }else {
-      this.setState({...this.state, product: newProduct})
-    }
+  getProduct = async (productId) => {
+    let newProduct = await this.state.categoryProducts.find((product) => productId === product.id )
+      try {
+        this.setState({...this.state, product: newProduct})
 
+      }catch(e) {
+        console.log(e)
+      }
   }
 
   htmlToReact(htmlInput) {
@@ -226,6 +227,7 @@ class App extends Component {
       if (this.state.cart.length === 0 ) {
         newItem.quantity = 1
         newItem.ativeImg = 0
+        newItem.id = newItem.id + nanoid(7)
         this.state.cart.push(JSON.parse(JSON.stringify(newItem)))
         this.setState({...this.state, cartTotalQuantity: this.state.cartTotalQuantity + 1, 
         })
@@ -238,6 +240,7 @@ class App extends Component {
         }else {
           newItem.quantity = 1
           newItem.ativeImg = 0
+          newItem.id = newItem.id + nanoid(7)
           this.state.cart.push(JSON.parse(JSON.stringify(newItem)))
           this.setState({
             ...this.state, 
@@ -321,7 +324,16 @@ class App extends Component {
 
   render() {
     return (
-      <div className="app" onClick={() => {if(!this.state.hideSelect) {this.toggleHideSelect()}}} >
+      <div 
+        className={this.state.hideCartOverlay ? "app" : "app_overlay"} 
+        onClick={(e) => {
+            if(!this.state.hideSelect) {this.toggleHideSelect()}
+            if(!this.state.hideCartOverlay && e.target.className === "app_overlay") {
+              this.toggleCartOverlay(e)
+            }
+          }
+        } 
+      >
         <Routes>
 
           <Route path="/" element={ 
@@ -392,6 +404,7 @@ class App extends Component {
                 getCategoryProducts = {this.getCategoryProducts} 
                 getProduct = {this.getProduct}
               />
+              
               :
               <UseWithRouter >
                   <Main 
@@ -448,9 +461,6 @@ class App extends Component {
               <Cart 
                 {...this.state} 
                 {...this.props}  
-                // currencySelect = {this.currencySelect}
-                // toggleHideSelect = {this.toggleHideSelect}
-                // setActiveImgInOverlay = {this.setActiveImgInOverlay}
                 setActiveAttributeInCart = {this.setActiveAttributeInCart} 
                 toggleCartOverlay = {this.toggleCartOverlay}
                 totalItemCartCounter = {this.totalItemCartCounter}

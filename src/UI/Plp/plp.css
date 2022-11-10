@@ -23,15 +23,17 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(386px, 1fr));
     grid-template-rows: auto;
-    grid-column-gap: auto-fit;
     grid-row-gap: 103px;
 }
 
 .product_item {
-    /* width: 350px; */
-    height: 444px;
     padding: 11px 14px 16px 16px;
-    /* background-color: #FFFFFF; */
+    margin: 0 auto;
+}
+
+.product_item:hover {
+    border: solid 16px #fff;
+    box-sizing: border-box;
 }
 
 .product_item_img {

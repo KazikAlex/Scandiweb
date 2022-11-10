@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@tilework/opus": "^0.0.10",
     "html-to-react": "^1.5.0",
+    "nanoid": "^4.0.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-redux": "^8.0.2",

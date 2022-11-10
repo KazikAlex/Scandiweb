@@ -1,5 +1,6 @@
 .main_cart_item_img_pictue_wrapper {
     position: relative;
+    z-index: 7;
 }
 
 .main_cart_item_img_pictue_left,
